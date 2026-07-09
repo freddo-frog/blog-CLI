@@ -75,15 +75,15 @@ def create_post():
     publish = input("publish now? (y/n): ")
     published = publish.lower() == "y"
 
-
     conn = get_connection()
     with conn.cursor() as cur:
         cur.execute(
             "INSERT INTO posts (title, body, published) VALUES(%s, %s, %s, %s) RETURNING id", (title, body, publish, published)
         )
         row = conn.fetchone()
-        conn.close()
         conn.commit()
+        conn.close()
+    
     
         print(f"post #{row[0]} created.")
     
