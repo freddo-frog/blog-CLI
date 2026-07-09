@@ -29,6 +29,16 @@ def get_user_id_by_username():
         else:
             print("username not found please try again")
             return None
+
+def search_post_title():
+    post = input("post title: ")
+    conn = get_connection()
+    with conn.cursor() as cur:
+        cur.execute("SELECT * FROM posts WHERE title = %s", (post,))
+        rows = cur.fetchall()
+        for row in rows:
+            print(row)
+        conn.close()
         
 
 #user functions
@@ -78,12 +88,35 @@ def create_post():
     conn = get_connection()
     with conn.cursor() as cur:
         cur.execute(
-            "INSERT INTO posts (title, body, published) VALUES(%s, %s, %s, %s) RETURNING id", (title, body, publish, published)
+            "INSERT INTO posts (title, body, published, user_id) VALUES (%s, %s, %s, %s) RETURNING id", (title, body, published, user_id)
         )
-        row = conn.fetchone()
+        row = cur.fetchone()
         conn.commit()
         conn.close()
     
     
         print(f"post #{row[0]} created.")
-    
+
+def list_posts():
+    conn = get_connection()
+    with conn.cursor() as cur:
+        cur.execute("SELECT * FROM posts;")
+        rows = cur.fetchall()
+        for row in rows:
+            print(row)
+    conn.close()
+
+def delete_post():
+    deleted = input("post to delete: ")
+    conn = get_connection()
+    with conn.cursor() as cur:
+        cur.execute("DELETE FROM posts WHERE id = %s RETURNING title", (deleted,))
+        row = cur.fetchone()
+
+        if row:
+            print(f"Post '{row[0]}' was deleted.")
+        
+        else:
+            print(f"no post found with title '{deleted}'.")
+    conn.commit()
+    conn.close()
