@@ -39,7 +39,7 @@ def search_post_title():
         for row in rows:
             print(row)
         conn.close()
-        
+
 
 #user functions
 def list_users():
@@ -117,6 +117,38 @@ def delete_post():
             print(f"Post '{row[0]}' was deleted.")
         
         else:
-            print(f"no post found with title '{deleted}'.")
+            print(f"post '{deleted}' was not found.")
     conn.commit()
     conn.close()
+
+#comment functions 
+def make_comment():
+    user_id = get_user_id_by_username()
+    if user_id == None:
+        print("no user found. please try again.")
+        return
+    list_posts() #hard part for this is going to be linking two foreign keys at once, user id and post id.
+    post_id = input("enter id of the would you like to comment on:")
+    conn = get_connection()
+    with conn.cursor() as cur:
+        cur.execute("SELECT title FROM posts WHERE id = %s", (post_id,))
+        row = cur.fetchone()
+
+        if row:
+            print(f"'{post_id}' was chosen.")
+            body = input("type comment:")
+            cur.execute("INSERT INTO comments (post_id, user_id, body) VALUES (%s, %s, %s)", (post_id, user_id, body))
+        else:
+            print("post was not found :( ")
+
+    conn.commit()
+    conn.close()
+
+def list_comments():
+    conn = get_connection()
+    with conn.cursor() as cur:
+        cur.execute("SELECT * FROM comments;")
+        rows = cur.fetchall()
+        for row in rows:
+            print(row)
+        conn.close()
