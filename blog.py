@@ -152,3 +152,17 @@ def list_comments():
         for row in rows:
             print(row)
         conn.close()
+
+def delete_comment():
+    term = input("comment to be deleted:")
+    conn = get_connection()
+    with conn.cursor() as cur:
+        cur.execute("DELETE FROM comments WHERE id, body = %s RETURNING id" (term,))
+        row = cur.fetchone()
+
+        if row:
+            print(f"Comment #{row[0]} ('{row[1]}') was deleted.")
+        else:
+            print(f"No comment found with id '{term}'.")
+    conn.commit()
+    conn.close()
