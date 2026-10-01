@@ -122,9 +122,38 @@ def delete_post():
     conn.close()
 
 def edit_post():
-  list_posts()
-  id = input("what post would you like to edit? (id)")
-#comment functions 
+    list_posts()
+    post_id = input("id of post to edit: ")
+    conn = get_connection()
+    with conn.cursor() as cur:
+        cur.execute("SELECT title, body FROM posts WHERE id = %s", (post_id,))
+        row = cur.fetchone()
+
+        if row is None:
+            print(f"post '{post_id}' was not found.")
+            conn.close()
+            return
+
+        print(f"current title: {row[0]}")
+        print(f"current body: {row[1]}")
+        new_title = input("new title (leave blank to keep): ")
+        new_body = input("new body (leave blank to keep): ")
+
+        #blank input keeps the old value
+        if new_title == "":
+            new_title = row[0]
+        if new_body == "":
+            new_body = row[1]
+
+        cur.execute(
+            "UPDATE posts SET title = %s, body = %s WHERE id = %s RETURNING id, title", (new_title, new_body, post_id)
+        )
+        updated = cur.fetchone()
+        print(f"post #{updated[0]} '{updated[1]}' was updated.")
+    conn.commit()
+    conn.close()
+
+#comment functions
 def make_comment():
     user_id = get_user_id_by_username()
     if user_id == None:
@@ -169,8 +198,3 @@ def delete_comment():
             print(f"No comment found with id '{term}'.")
     conn.commit()
     conn.close()
-
-
-
-
-
