@@ -121,6 +121,9 @@ def delete_post():
     conn.commit()
     conn.close()
 
+def edit_post():
+  list_posts()
+  id = input("what post would you like to edit? (id)")
 #comment functions 
 def make_comment():
     user_id = get_user_id_by_username()
@@ -166,3 +169,8 @@ def delete_comment():
             print(f"No comment found with id '{term}'.")
     conn.commit()
     conn.close()
+
+
+
+
+
