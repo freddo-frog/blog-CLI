@@ -189,7 +189,7 @@ def delete_comment():
     term = input("comment to be deleted:")
     conn = get_connection()
     with conn.cursor() as cur:
-        cur.execute("DELETE FROM comments WHERE id, body = %s RETURNING id" (term,))
+        cur.execute("DELETE FROM comments WHERE id = %s RETURNING id, body", (term,))
         row = cur.fetchone()
 
         if row:
