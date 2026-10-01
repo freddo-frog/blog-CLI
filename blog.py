@@ -198,3 +198,66 @@ def delete_comment():
             print(f"No comment found with id '{term}'.")
     conn.commit()
     conn.close()
+
+
+#--- main loop ---
+def show_menu():
+    print("\n--- blog menu ---")
+    print("users:")
+    print("  1. new user")
+    print("  2. list users")
+    print("  3. search user")
+    print("  4. delete user")
+    print("posts:")
+    print("  5. create post")
+    print("  6. list posts")
+    print("  7. search post by title")
+    print("  8. edit post")
+    print("  9. delete post")
+    print("comments:")
+    print("  10. make comment")
+    print("  11. list comments")
+    print("  12. delete comment")
+    print("  q. quit")
+
+#each menu choice maps to the function it runs
+ACTIONS = {
+    "1": new_user,
+    "2": list_users,
+    "3": search_user,
+    "4": delete_user,
+    "5": create_post,
+    "6": list_posts,
+    "7": search_post_title,
+    "8": edit_post,
+    "9": delete_post,
+    "10": make_comment,
+    "11": list_comments,
+    "12": delete_comment,
+}
+
+def main():
+    while True:
+        show_menu()
+        choice = input("choose an option: ").strip().lower()
+
+        if choice in ("q", "quit", "exit"):
+            print("bye!")
+            break
+
+        action = ACTIONS.get(choice)
+        if action is None:
+            print(f"'{choice}' is not a valid option, try again.")
+            continue
+
+        #a bad input (e.g. letters for an id) raises a db error - report it and keep the loop going
+        try:
+            action()
+        except psycopg.Error as e:
+            print(f"database error: {e}")
+
+if __name__ == "__main__":
+    try:
+        main()
+    except (KeyboardInterrupt, EOFError):
+        print("\nbye!")
